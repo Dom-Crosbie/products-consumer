@@ -45,7 +45,7 @@ jobs:
       
       - name: Publish Pact contracts to PactFlow
         run: |
-          npx pact-broker publish ./pacts \
+          npx --yes @pact-foundation/pact-cli@latest pact-broker publish ./pacts \
             --consumer-app-version ${{ steps.git-info.outputs.full-hash }} \
             --branch ${{ steps.git-info.outputs.branch }} \
             --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
@@ -57,7 +57,7 @@ jobs:
       - name: Can I Deploy - Check deployment safety
         id: can-i-deploy
         run: |
-          npx pact-broker can-i-deploy \
+          npx --yes @pact-foundation/pact-cli@latest pact-broker can-i-deploy \
             --pacticipant products-consumer \
             --version ${{ steps.git-info.outputs.full-hash }} \
             --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
