@@ -44,27 +44,21 @@ jobs:
           echo "full-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       
       - name: Publish Pact contracts to PactFlow
-        run: |
-          npx --yes @pact-foundation/pact-cli@latest pact-broker publish ./pacts \
-            --consumer-app-version ${{ steps.git-info.outputs.full-hash }} \
-            --branch ${{ steps.git-info.outputs.branch }} \
-            --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
-            --broker-token ${{ secrets.PACT_BROKER_TOKEN }}
-        env:
-          PACT_BROKER_BASE_URL: ${{ secrets.PACT_BROKER_BASE_URL }}
-          PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+        uses: pactflow/actions/publish-pact-files@v1.0.0
+        with:
+          pactfiles: './pacts'
+          version: ${{ steps.git-info.outputs.full-hash }}
+          branch: ${{ steps.git-info.outputs.branch }}
+          pactbroker-url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          pactbroker-token: ${{ secrets.PACT_BROKER_TOKEN }}
       
       - name: Can I Deploy - Check deployment safety
-        id: can-i-deploy
-        run: |
-          npx --yes @pact-foundation/pact-cli@latest pact-broker can-i-deploy \
-            --pacticipant products-consumer \
-            --version ${{ steps.git-info.outputs.full-hash }} \
-            --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
-            --broker-token ${{ secrets.PACT_BROKER_TOKEN }}
-        env:
-          PACT_BROKER_BASE_URL: ${{ secrets.PACT_BROKER_BASE_URL }}
-          PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+        uses: pactflow/actions/can-i-deploy@v1.0.0
+        with:
+          pacticipant: 'products-consumer'
+          version: ${{ steps.git-info.outputs.full-hash }}
+          pactbroker-url: ${{ secrets.PACT_BROKER_BASE_URL }}
+          pactbroker-token: ${{ secrets.PACT_BROKER_TOKEN }}
       
       - name: Deploy status check
         run: |
