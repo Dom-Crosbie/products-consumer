@@ -19,7 +19,8 @@ describe('API Pact test', () => {
       const expectedProduct = {
         id: '10',
         type: 'CREDIT_CARD',
-        name: '28 Degrees'
+        name: '28 Degrees',
+        version: 'v1'
       };
 
       mockProvider
@@ -27,7 +28,7 @@ describe('API Pact test', () => {
         .uponReceiving('a request to get a product')
         .withRequest({
           method: 'GET',
-          path: '/product/10',
+          path: '/v1/product/10',
           headers: {
             Authorization: like('Bearer dynamic-token')
           }
@@ -59,7 +60,7 @@ describe('API Pact test', () => {
         .uponReceiving('a request to get a product')
         .withRequest({
           method: 'GET',
-          path: '/product/12',
+          path: '/v1/product/12',
           headers: {
             Authorization: like('Bearer dynamic-token')
           }
@@ -83,7 +84,8 @@ describe('API Pact test', () => {
       const expectedProduct = {
         id: '10',
         type: 'CREDIT_CARD',
-        name: '28 Degrees'
+        name: '28 Degrees',
+        version: 'v1'
       };
 
       mockProvider
@@ -91,7 +93,7 @@ describe('API Pact test', () => {
         .uponReceiving('a request to get all products')
         .withRequest({
           method: 'GET',
-          path: '/products',
+          path: '/v1/products',
           headers: {
             Authorization: like('Bearer dynamic-token')
           }

@@ -25,7 +25,7 @@ export class API {
 
   async getAllProducts() {
     return axios
-      .get(this.withPath('/products'), {
+      .get(this.withPath('/v1/products'), {
         headers: {
           Authorization: this.generateAuthToken()
         }
@@ -35,7 +35,7 @@ export class API {
 
   async getProduct(id) {
     return axios
-      .get(this.withPath('/product/' + id), {
+      .get(this.withPath('/v1/product/' + id), {
         headers: {
           Authorization: this.generateAuthToken()
         }
