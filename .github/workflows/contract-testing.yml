@@ -1,0 +1,72 @@
+name: PactFlow Contract Testing CI
+
+on:
+  push:
+    branches:
+      - products-consumer
+      - main
+      - master
+  pull_request:
+    branches:
+      - products-consumer
+      - main
+      - master
+
+jobs:
+  test-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get full history for better git info
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run Pact tests
+        run: npm run test:pact
+        env:
+          CI: true
+      
+      - name: Get Git commit info
+        id: git-info
+        run: |
+          echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+          echo "full-hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+      
+      - name: Publish Pact contracts to PactFlow
+        run: |
+          npx pact-broker publish ./pacts \
+            --consumer-app-version ${{ steps.git-info.outputs.full-hash }} \
+            --branch ${{ steps.git-info.outputs.branch }} \
+            --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
+            --broker-token ${{ secrets.PACT_BROKER_TOKEN }}
+        env:
+          PACT_BROKER_BASE_URL: ${{ secrets.PACT_BROKER_BASE_URL }}
+          PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+      
+      - name: Can I Deploy - Check deployment safety
+        id: can-i-deploy
+        run: |
+          npx pact-broker can-i-deploy \
+            --pacticipant products-consumer \
+            --version ${{ steps.git-info.outputs.full-hash }} \
+            --broker-base-url ${{ secrets.PACT_BROKER_BASE_URL }} \
+            --broker-token ${{ secrets.PACT_BROKER_TOKEN }}
+        env:
+          PACT_BROKER_BASE_URL: ${{ secrets.PACT_BROKER_BASE_URL }}
+          PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
+      
+      - name: Deploy status check
+        run: |
+          echo "✅ Contract testing completed successfully!"
+          echo "🚀 Consumer version ${{ steps.git-info.outputs.hash }} is safe to deploy"
