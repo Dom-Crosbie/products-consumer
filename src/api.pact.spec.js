@@ -125,7 +125,7 @@ describe('API Pact test', () => {
       });
     });
 
-    test('no products exist - empty array', async () => {
+    test('no products exist', async () => {
       // Arrange
       mockProvider
         .given('no products exist')
