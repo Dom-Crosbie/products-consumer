@@ -1,3 +1,4 @@
+// Contract tests for products-consumer API interactions
 import { PactV3 } from '@pact-foundation/pact';
 import { API } from './api';
 import { MatchersV3 } from '@pact-foundation/pact';
